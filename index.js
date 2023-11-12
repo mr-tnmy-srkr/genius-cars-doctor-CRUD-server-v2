@@ -71,8 +71,8 @@ async function run() {
       res
         .cookie("token", token, {
           httpOnly: true,
-          secure: true,
-          sameSite: "none",
+          secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
         })
         .send({ success: true });
     });
@@ -80,7 +80,10 @@ async function run() {
     app.post("/logout", async (req, res) => {
       const user = req.body;
       console.log("logging out", user);
-      res.clearCookie("token", { maxAge: 0 }).send({ success: true });
+      // res.clearCookie("token", { maxAge: 0 }).send({ success: true });
+      res
+      .clearCookie("token", { maxAge: 0, sameSite: "none", secure: true })
+      .send({ success: true });
     });
 
     //service related api
